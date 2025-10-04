@@ -7,11 +7,11 @@
 
 1.  **Add the Helm repository:**
     ```sh
-    helm repo add bpschmitt https://bpschmitt.github.io/otel-operator-multitenant-helm
+    helm repo add bpschmitt https://bpschmitt.github.io/otel-operator-multitenant
     helm repo update
     ```
 
 2.  **Install the chart:**
     ```sh
-    helm install otel-operator-multitenant bpschmitt/otel-operator-multitenant-helm --namespace [NAMESPACE]
+    helm template otel-operator-multitenant bpschmitt/otel-operator-multitenant --namespace [NAMESPACE]
     ```
