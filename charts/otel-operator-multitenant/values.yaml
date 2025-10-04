@@ -68,29 +68,15 @@ global:
         test.label: team-b
         namespaces:
           - team-b
-      team-c:
-        licenseKey:
-          secretRef:
-            name: newrelic-license-key-vz-app-team-c
-            key: license
-        test.label: team-c
-        namespaces:
-          - team-c
-      # # Dev team 2 which is responsible for its own apps running
-      # # in a specific namespace.
-      # devteam2:
+      # team-c:
       #   licenseKey:
-      #     value: ""
+      #     secretRef:
+      #       name: newrelic-license-key-vz-app-team-c
+      #       key: license
+      #   test.label: team-c
       #   namespaces:
-      #     - devteam2
-      # # Dev team 3 which is responsible for its own apps running
-      # # in a specific namespace but not on this cluster.
-      # devteam3:
-      #   ignore: true
-      #   licenseKey:
-      #     value: ""
-      #   namespaces:
-      #     - devteam3
+      #     - team-c
+      
 
 # # Kube state metrics
 # kube-state-metrics:

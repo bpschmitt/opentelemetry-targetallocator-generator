@@ -146,7 +146,3 @@ spec:
           exporters: [debug]
           {{- "" | nindent 12 }}  
         {{- end }}
-        metrics/debug:
-          receivers: [routing/metrics]
-          processors: [memory_limiter, batch]
-          exporters: [debug]
