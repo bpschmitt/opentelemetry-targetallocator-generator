@@ -62,6 +62,7 @@ Create the name of the service account to use
 {{- end }}
 
 
+
 {{- define "otel-operator-multitenant.test123" -}}
 {{- $teams := dict -}}
   {{- $teams = .Values.global.newrelic.teams -}}
