@@ -63,7 +63,7 @@ Create the name of the service account to use
 
 
 
-{{- define "otel-operator-multitenant.test123" -}}
+{{- define "otel-operator-multitenant.teams" -}}
 {{- $teams := dict -}}
   {{- $teams = .Values.global.newrelic.teams -}}
   {{- range $teamName, $teamInfo := $teams -}}
@@ -71,3 +71,25 @@ Create the name of the service account to use
   {{- end -}}
   {{- $teams | toYaml -}}
 {{- end }}
+
+{{/*
+Set name for target allocator.
+*/}}
+{{- define "otel-operator-multitenant.targetAllocatorName" -}}
+{{- if .Values.targetAllocatorName -}}
+{{- printf "%s" .Values.targetAllocatorName -}}
+{{- else -}}
+{{- printf "%s-%s" (include "otel-operator-multitenant.name" .) "sts-targetallocator" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set image tag for statefulset collectors.
+*/}}
+{{- define "otel-operator-multitenant.targetAllocatorImageTag" -}}
+{{- if .Values.image.tag -}}
+{{- printf "%s" .Values.image.tag -}}
+{{- else -}}
+{{- printf "%s" .Chart.AppVersion -}}
+{{- end -}}
+{{- end -}}

@@ -1,13 +1,12 @@
-{{- $teams := include "otel-operator-multitenant.test123" . | fromYaml }}
+{{- $teams := include "otel-operator-multitenant.teams" . | fromYaml }}
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
-  name: collector-with-ta
-  namespace: opentelemetry
+  name: {{ include "otel-operator-multitenant.targetAllocatorName" . }}
+  namespace: {{ .Release.Namespace }}
 spec:
   mode: statefulset
-  replicas: 2
-  serviceAccount: targetallocator-sa
+  replicas: {{ .Values.replicas | int }}
   env:
   {{- range $teamName, $teamInfo := $teams }}
   - name: NR_LICENSE_KEY_{{ $teamName | upper | replace "-" "_" }}
@@ -16,20 +15,54 @@ spec:
         name: {{ $teamInfo.licenseKey.secretRef.name }}
         key: {{ $teamInfo.licenseKey.secretRef.key }}
   {{- end }}
+
+  # Annotations for the pods
+  podAnnotations:
+    prometheus.io/scrape: "false" # This should be false by default. Otherwise 'otelcollector' self scraper job AND 'kubernetes-pods' scrape job will both scrape
+  {{- range $key, $val := .Values.annotations }}
+    {{ $key }}: {{ $val }}
+  {{- end }}
+
   targetAllocator:
     enabled: true
-    serviceAccount: targetallocator-sa
+    serviceAccount: {{ include "otel-operator-multitenant.targetAllocatorName" . }}
     prometheusCR:
       enabled: true
       podMonitorSelector: {}
       serviceMonitorSelector: {}
+
+  # Security context for container priviliges
+  {{- with .Values.securityContext }}
+  securityContext: {{ toYaml . | nindent 4 }}
+  {{- end }}
+
+  # Ports to expose per service
+  ports:
+    - name: prometheus
+      protocol: TCP
+      port: {{ .Values.ports.prometheus.port }}
+      targetPort: {{ .Values.ports.prometheus.targetPort }}
+
+  # Image
+  image: "{{ .Values.image.repository }}:{{ include "otel-operator-multitenant.targetAllocatorImageTag" . }}"
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+  # Resources
+  resources:
+    requests:
+      cpu: {{ .Values.resources.requests.cpu }}
+      memory: {{ .Values.resources.requests.memory }}
+    limits:
+      cpu: {{ .Values.resources.limits.cpu }}
+      memory: {{ .Values.resources.limits.memory }}
+
   config:
     receivers:
       prometheus:
         config:
           scrape_configs:
           - job_name: 'otel-collector'
-            scrape_interval: 10s
+            scrape_interval: 30s
             static_configs:
             - targets: [ '0.0.0.0:8888' ]
             metric_relabel_configs:
@@ -46,7 +79,6 @@ spec:
         limit_mib: 4000
         spike_limit_mib: 200
       batch: {}
-
       k8sattributes:
         auth_type: "serviceAccount"
         passthrough: false
@@ -84,24 +116,23 @@ spec:
           # - sources:
           #     # This rule will use the IP from the incoming connection from which the resource is received, and find the matching pod, based on the 'pod.status.podIP' of the observed pods
           #     - from: connection
-      
+
       resource:
         attributes:
           - action: upsert
             key: newrelic.entity.type
             value: k8s
-      
+
+
       {{- range $teamName, $teamInfo := $teams }}
       resource/{{ $teamName }}:
         attributes:
           - key: "collector.source"
             action: "insert"
             value: "{{ $teamName}}"
-      {{- "" | nindent 12 }}  
       {{- end }}
 
     connectors:
-    
       routing/metrics:
         default_pipelines: [metrics/default]
         table:
@@ -110,39 +141,33 @@ spec:
             condition: 'resource.attributes["k8s.namespace.name"] == "{{ $teamName }}"{{ if $teamInfo.vsad }}or resource.attributes["verizon.vsad"] == "{{ $teamInfo.test.label}}"{{ end }}'
             pipelines:
               - metrics/{{ $teamName }}
-          {{- "" | nindent 12 }}    
           {{- end }}
 
 
     exporters:
-
       debug: {}
       {{- range $teamName, $teamInfo := $teams }}
       otlphttp/{{ $teamName }}:
         endpoint: {{ $teamInfo.endpoint}}
         headers:
           api-key: ${NR_LICENSE_KEY_{{ $teamName | upper | replace "-" "_" }}}
-      {{- "" | nindent 12 }}  
       {{- end }}
 
     service:
-      pipelines: 
+      pipelines:
         metrics/default:
           receivers: [routing/metrics]
           processors: [memory_limiter, resource, resource/platform, batch]
           # The routing connector acts as an exporter for the first pipeline...
           exporters: [debug]
-
         metrics/ingress:
           receivers: [prometheus]
           processors: [memory_limiter, batch]
           # The routing connector acts as an exporter for the first pipeline...
           exporters: [routing/metrics]
-        {{- "" | nindent 12 }}  
         {{- range $teamName, $teamInfo := $teams }}
         metrics/{{ $teamName}}:
           receivers: [routing/metrics]
           processors: [memory_limiter, resource, resource/{{ $teamName }}, k8sattributes, batch]
           exporters: [debug]
-          {{- "" | nindent 12 }}  
         {{- end }}
