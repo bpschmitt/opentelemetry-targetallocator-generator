@@ -23,7 +23,7 @@ global:
           # namespace as this Helm deployment, provide the secret name and the key to
           # license key.
           secretRef:
-            name: newrelic-license-key-vz-platform-team
+            name: newrelic-license-key-platform-team
             key: license
 
       # If you want to send the namespaced telemetry data from the
@@ -34,33 +34,33 @@ global:
       team-a:
         licenseKey:
           secretRef:
-            name: newrelic-license-key-vz-app-team-a
+            name: newrelic-license-key-app-team-a
             key: license
-        test.label: team-a
+        identifier: team-a
         namespaces:
           - team-a
       team-b:
         licenseKey:
           secretRef:
-            name: newrelic-license-key-vz-app-team-b
+            name: newrelic-license-key-app-team-b
             key: license
-        test.label: team-b
+        identifier: team-b
         namespaces:
           - team-b
       team-c:
         licenseKey:
           secretRef:
-            name: newrelic-license-key-vz-app-team-c
+            name: newrelic-license-key-app-team-c
             key: license
-        test.label: team-c
+        identifier: team-c
         namespaces:
           - team-c
       team-d:
         licenseKey:
           secretRef:
-            name: newrelic-license-key-vz-app-team-d
+            name: newrelic-license-key-app-team-d
             key: license
-        test.label: team-d
+        identifier: team-d
         namespaces:
           - team-d
 
@@ -257,7 +257,7 @@ targetAllocator:
 #           # namespace as this Helm deployment, provide the secret name and the key to
 #           # license key.
 #           secretRef:
-#             name: newrelic-license-key-vz-platform-team
+#             name: newrelic-license-key-platform-team
 #             key: license
 #         # Namespaces to filter the gathered telemetry data
 #         # -> If nothing is defined, all telemetry data will be sent
@@ -271,7 +271,7 @@ targetAllocator:
 #       team-a:
 #         licenseKey:
 #           secretRef:
-#             name: newrelic-license-key-vz-app-team-a
+#             name: newrelic-license-key-app-team-a
 #             key: license
 #         test.label: team-a
 #         namespaces:
@@ -279,7 +279,7 @@ targetAllocator:
 #       team-b:
 #         licenseKey:
 #           secretRef:
-#             name: newrelic-license-key-vz-app-team-b
+#             name: newrelic-license-key-app-team-b
 #             key: license
 #         test.label: team-b
 #         namespaces:
@@ -287,7 +287,7 @@ targetAllocator:
 #       team-c:
 #         licenseKey:
 #           secretRef:
-#             name: newrelic-license-key-vz-app-team-c
+#             name: newrelic-license-key-app-team-c
 #             key: license
 #         test.label: team-c
 #         namespaces:
@@ -295,7 +295,7 @@ targetAllocator:
 #       team-d:
 #         licenseKey:
 #           secretRef:
-#             name: newrelic-license-key-vz-app-team-d
+#             name: newrelic-license-key-app-team-d
 #             key: license
 #         test.label: team-d
 #         namespaces:

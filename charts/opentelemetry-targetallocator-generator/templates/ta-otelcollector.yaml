@@ -138,7 +138,7 @@ spec:
         table:
           {{- range $teamName, $teamInfo := $teams }}
           - context: metric
-            condition: 'resource.attributes["k8s.namespace.name"] == "{{ $teamName }}"{{ if $teamInfo.vsad }}or resource.attributes["verizon.vsad"] == "{{ $teamInfo.test.label}}"{{ end }}'
+            condition: 'resource.attributes["k8s.namespace.name"] == "{{ $teamName }}"{{ if $teamInfo.identifier }}or resource.attributes["tenant.name"] == "{{ $teamInfo.identifier }}"{{ end }}'
             pipelines:
               - metrics/{{ $teamName }}
           {{- end }}
