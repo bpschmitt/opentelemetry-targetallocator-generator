@@ -7,11 +7,11 @@
 
 1.  **Add the Helm repository:**
     ```sh
-    helm repo add bpschmitt https://bpschmitt.github.io/otel-operator-multitenant
+    helm repo add bpschmitt https://bpschmitt.github.io/opentelemetry-targetallocator-generator
     helm repo update
     ```
 
 2.  **Install the chart:**
     ```sh
-    helm template otel-operator-multitenant bpschmitt/otel-operator-multitenant --namespace [NAMESPACE]
+    helm template ta-multitenant bpschmitt/opentelemetry-targetallocator-generator --namespace [NAMESPACE]
     ```
