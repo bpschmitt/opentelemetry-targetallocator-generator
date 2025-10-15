@@ -149,20 +149,20 @@ resources:
     memory: 512Mi
 
 # Number of replicas
-replicas: 2
+replicas: 1
 
 # Autoscaling configuration. Update according to your own use case.
-autoscaler:
-  # Flag whether HPA should be enabled
-  enabled: true
-  # Number of minimum available replicas
-  minReplicas: 1
-  # Number of maximum available replicas
-  maxReplicas: 4
-  # Target CPU utilization to keep amongst the replicas
-  targetCPUUtilization: 70
-  # Target MEM utilization to keep amongst the replicas
-  targetMemoryUtilization: 70
+# autoscaler:
+#   # Flag whether HPA should be enabled
+#   enabled: true
+#   # Number of minimum available replicas
+#   minReplicas: 1
+#   # Number of maximum available replicas
+#   maxReplicas: 4
+#   # Target CPU utilization to keep amongst the replicas
+#   targetCPUUtilization: 70
+#   # Target MEM utilization to keep amongst the replicas
+#   targetMemoryUtilization: 70
 
 # Target allocator
 targetAllocator:
