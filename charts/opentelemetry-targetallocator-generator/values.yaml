@@ -50,7 +50,7 @@ global:
 
 targetAllocatorName: ""
 
-fullnameOverride:
+fullnameOverride: ""
 
 # Image
 image:
@@ -64,7 +64,7 @@ image:
 # Service account
 serviceAccount:
   # Annotations to add to the service account
-  annotations: 
+  annotations:  {}
 
 # Security context for container priviliges
 securityContext: {}
@@ -80,89 +80,50 @@ clusterRole:
   # Can be used in combination with presets that create a cluster role to add additional rules.
   rules:
     - apiGroups:
-      - discovery.k8s.io
+      - monitoring.coreos.com
       resources:
-        - endpointslices
-      verbs:
-        - get
-        - list
-        - watch
-    - apiGroups:
-      - "monitoring.coreos.com"
-      resources:
-        - podmonitors
+        - alertmanagers
+        - prometheuses
+        - prometheuses/finalizers
+        - alertmanagers/finalizers
         - servicemonitors
+        - podmonitors
+        - prometheusrules
+        - probes
+        - scrapeconfigs
       verbs:
-        - get
-        - list
-        - watch
+        - '*'
     - apiGroups:
-      - ""
+        - apps
       resources:
-        - events
-        - namespaces
-        - namespaces/status
-        - nodes
-        - nodes/spec
-        - nodes/stats
-        - nodes/proxy
-        - nodes/metrics
-        - pods
-        - pods/status
-        - replicationcontrollers
-        - replicationcontrollers/status
-        - resourcequotas
-        - services
-        - endpoints
-        - ingresses
-        - configmaps
-      verbs:
-        - get
-        - list
-        - watch
-    - apiGroups:
-      - apps
-      resources:
-        - daemonsets
-        - deployments
-        - replicasets
         - statefulsets
       verbs:
-        - get
-        - list
-        - watch
-    - apiGroups:
-        - extensions
+        - '*'
+    - apiGroups: [""]
       resources:
-        - daemonsets
-        - deployments
-        - replicasets
-      verbs:
-        - get
-        - list
-        - watch
-    - apiGroups:
-        - batch
+        - namespaces
+        - nodes
+        - nodes/metrics
+        - services
+        - endpoints
+        - pods
+      verbs: ["get", "list", "watch"]
+    - apiGroups: [""]
       resources:
-        - jobs
-        - cronjobs
-      verbs:
-        - get
-        - list
-        - watch
+        - configmaps
+      verbs: ["get"]
     - apiGroups:
-        - autoscaling
+        - discovery.k8s.io
       resources:
-        - horizontalpodautoscalers
-      verbs:
-        - get
-        - list
-        - watch
-    - nonResourceURLs:
-        - "/metrics"
-        - "/metrics/cadvisor"
-      verbs:
-        - "get"
+        - endpointslices
+      verbs: ["get", "list", "watch"]
+    - apiGroups:
+        - networking.k8s.io
+      resources:
+        - ingresses
+      verbs: ["get", "list", "watch"]
+    - nonResourceURLs: ["/metrics"]
+      verbs: ["get"]
 
 clusterRoleBinding:
   # Annotations to add to the clusterRoleBinding
