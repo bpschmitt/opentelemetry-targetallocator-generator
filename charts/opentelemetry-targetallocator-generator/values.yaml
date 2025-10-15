@@ -94,6 +94,14 @@ clusterRole:
   # Can be used in combination with presets that create a cluster role to add additional rules.
   rules:
     - apiGroups:
+      - discovery.k8s.io
+      resources:
+        - endpointslices
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
       - "monitoring.coreos.com"
       resources:
         - podmonitors
