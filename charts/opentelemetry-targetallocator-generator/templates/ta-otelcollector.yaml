@@ -7,6 +7,7 @@ metadata:
 spec:
   mode: statefulset
   replicas: {{ .Values.replicas | int }}
+  serviceAccount: {{ include "opentelemetry-targetallocator-generator.targetAllocatorName" . }}
   env:
   {{- range $teamName, $teamInfo := $teams }}
   - name: NR_LICENSE_KEY_{{ $teamName | upper | replace "-" "_" }}
