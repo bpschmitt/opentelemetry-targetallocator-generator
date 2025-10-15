@@ -94,6 +94,15 @@ clusterRole:
   # Can be used in combination with presets that create a cluster role to add additional rules.
   rules:
     - apiGroups:
+      - "monitoring.coreos.com"
+      resources:
+        - podmonitors
+        - servicemonitors
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
       - ""
       resources:
         - events
