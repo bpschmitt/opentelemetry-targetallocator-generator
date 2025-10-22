@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> This chart is not intended for production and is only a proof of concept.
+> This chart is not intended for production use and is only a proof of concept.
 
 # OpenTelemetry Target Allocator Generator
 
@@ -29,4 +29,10 @@ To install the chart with the release name `ta-generator`:
 ```sh
 helm repo add ta-generator https://bpschmitt.github.io/opentelemetry-targetallocator-generator
 helm repo update ta-generator
+```
+
+To generate YAML manifests:
+
+```sh
+helm template ta-generator ta-generator/opentelemetry-targetallocator-generator > ta-otelcollector-manifest.yaml
 ```
