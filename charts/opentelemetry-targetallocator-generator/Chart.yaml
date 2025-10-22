@@ -1,7 +1,7 @@
 apiVersion: v2
 name: opentelemetry-targetallocator-generator
 description: An OpenTelemetryCollector config generator
-version: 0.1.13
+version: 0.1.14
 
 # Define the repository for OpenTelemetry charts
 # This repository hosts the opentelemetry-operator subchart.
