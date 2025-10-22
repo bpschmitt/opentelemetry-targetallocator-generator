@@ -1,6 +1,13 @@
-# Default values for otel-operator-multitenant.
+# Default values for opentelemetry-targetallocator-generator.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
+# Number of replicas
+replicas: 1
+
+targetAllocatorName: ""
+
+fullnameOverride: ""
 
 global:
   # New Relic account configuration
@@ -10,7 +17,7 @@ global:
     # For EU accounts -> https://otlp.eu01.nr-data.net
     endpoint: "https://otlp.nr-data.net"
     # Teams to segragete the telemetry data received by all of the collectors.
-    teams: 
+    teams:
       team-a:
         licenseKey:
           secretRef:
@@ -31,31 +38,26 @@ global:
           value: team-b
         namespaces:
           - team-b
-      team-c:
-        licenseKey:
-          secretRef:
-            name: newrelic-license-key-app-team-c
-            key: license
-        identifier:
-          key: test.label
-          value: team-c
-        namespaces:
-          - team-c
-      team-d:
-        licenseKey:
-          secretRef:
-            name: newrelic-license-key-app-team-d
-            key: license
-        identifier:
-          key: test.label
-          value: team-d
-        namespaces:
-          - team-d
-
-
-targetAllocatorName: ""
-
-fullnameOverride: ""
+      # team-c:
+      #   licenseKey:
+      #     secretRef:
+      #       name: newrelic-license-key-app-team-c
+      #       key: license
+      #   identifier:
+      #     key: test.label
+      #     value: team-c
+      #   namespaces:
+      #     - team-c
+      # team-d:
+      #   licenseKey:
+      #     secretRef:
+      #       name: newrelic-license-key-app-team-d
+      #       key: license
+      #   identifier:
+      #     key: test.label
+      #     value: team-d
+      #   namespaces:
+      #     - team-d
 
 # Image
 image:
@@ -143,22 +145,6 @@ resources:
   limits:
     memory: 512Mi
 
-# Number of replicas
-replicas: 1
-
-# Autoscaling configuration. Update according to your own use case.
-# autoscaler:
-#   # Flag whether HPA should be enabled
-#   enabled: true
-#   # Number of minimum available replicas
-#   minReplicas: 1
-#   # Number of maximum available replicas
-#   maxReplicas: 4
-#   # Target CPU utilization to keep amongst the replicas
-#   targetCPUUtilization: 70
-#   # Target MEM utilization to keep amongst the replicas
-#   targetMemoryUtilization: 70
-
 # Target allocator
 targetAllocator:
   # Strategy to filter the discovered targets before distributing them across collectors.
@@ -175,230 +161,3 @@ targetAllocator:
     enabled: true
   podMonitorSelector: {}
   serviceMonitorSelector: {}
-
-
-
-###########
-
-
-
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-# serviceAccount:
-#   # Specifies whether a service account should be created
-#   create: true
-#   # Automatically mount a ServiceAccount's API credentials?
-#   automount: true
-#   # Annotations to add to the service account
-#   annotations: {}
-#   # The name of the service account to use.
-#   # If not set and create is true, a name is generated using the fullname template
-#   name: ""
-
-### GLOBAL CONFIG ###
-# Global config for ease of use to apply to all collector types.
-# global:
-#   # New Relic account configuration
-#   newrelic:
-#     # Flag to enable global New Relic configuration.
-#     # -> If it is enabled, the individual New Relic sections for deployment, daemonset
-#     #    and statefulset will be ignored
-#     enabled: true
-#     # OTLP endpoint for all New Relic accounts
-#     # For US accounts -> https://otlp.nr-data.net
-#     # For EU accounts -> https://otlp.eu01.nr-data.net
-#     endpoint: "https://otlp.nr-data.net"
-#     # Teams to segragete the telemetry data received by all of the collectors.
-#     teams:
-#       # Platform team which is responsible for the cluster and common apps
-#       # running on it.
-#       platform:
-#         # New Relic ingest license key
-#         # -> Use either "value" or "secretRef" where "secretRef" will precede if both are defined
-#         licenseKey:
-#           # If you want to create a new secret, provide to the license key as a Helm value.
-#           # value: ""
-#           # If you already have your license key as a secret stored within the same
-#           # namespace as this Helm deployment, provide the secret name and the key to
-#           # license key.
-#           secretRef:
-#             name: newrelic-license-key-platform-team
-#             key: license
-#         # Namespaces to filter the gathered telemetry data
-#         # -> If nothing is defined, all telemetry data will be sent
-#         namespaces: []
-
-#       # # If you want to send the namespaced telemetry data from the
-#       # # cluster to the accounts of the individual dev teams
-#       # # comment in below.
-#       # # Dev team 1 which is responsible for its own apps running
-#       # # in a specific namespace.
-#       team-a:
-#         licenseKey:
-#           secretRef:
-#             name: newrelic-license-key-app-team-a
-#             key: license
-#         test.label: team-a
-#         namespaces:
-#           - team-a
-#       team-b:
-#         licenseKey:
-#           secretRef:
-#             name: newrelic-license-key-app-team-b
-#             key: license
-#         test.label: team-b
-#         namespaces:
-#           - team-b
-#       team-c:
-#         licenseKey:
-#           secretRef:
-#             name: newrelic-license-key-app-team-c
-#             key: license
-#         test.label: team-c
-#         namespaces:
-#           - team-c
-#       team-d:
-#         licenseKey:
-#           secretRef:
-#             name: newrelic-license-key-app-team-d
-#             key: license
-#         test.label: team-d
-#         namespaces:
-#           - team-d
-
-#   # Configure resource limits for the kube-state-metrics pod
-#   resources:
-#     limits:
-#       cpu: 150m
-#       memory: 200Mi
-#     requests:
-#       cpu: 50m
-#       memory: 100Mi
-  
-# # Ensure RBAC is enabled for proper operation
-# rbac:
-#   create: true
-
-# # You can specify additional labels or annotations here
-# commonLabels:
-#   app.kubernetes.io/component: target-allocator
-
-# # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-# replicaCount: 1
-
-
-# # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
-# image:
-#   repository: nginx
-#   # This sets the pull policy for images.
-#   pullPolicy: IfNotPresent
-#   # Overrides the image tag whose default is the chart appVersion.
-#   tag: ""
-
-# # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-# imagePullSecrets: []
-# # This is to override the chart name.
-# nameOverride: ""
-# fullnameOverride: ""
-
-# # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-# serviceAccount:
-#   # Specifies whether a service account should be created
-#   create: true
-#   # Automatically mount a ServiceAccount's API credentials?
-#   automount: true
-#   # Annotations to add to the service account
-#   annotations: {}
-#   # The name of the service account to use.
-#   # If not set and create is true, a name is generated using the fullname template
-#   name: ""
-
-# # This is for setting Kubernetes Annotations to a Pod.
-# # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-# podAnnotations: {}
-# # This is for setting Kubernetes Labels to a Pod.
-# # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-# podLabels: {}
-
-# podSecurityContext: {}
-#   # fsGroup: 2000
-
-# securityContext: {}
-#   # capabilities:
-#   #   drop:
-#   #   - ALL
-#   # readOnlyRootFilesystem: true
-#   # runAsNonRoot: true
-#   # runAsUser: 1000
-
-# # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
-# service:
-#   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-#   type: ClusterIP
-#   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-#   port: 80
-
-# # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
-# ingress:
-#   enabled: false
-#   className: ""
-#   annotations: {}
-#     # kubernetes.io/ingress.class: nginx
-#     # kubernetes.io/tls-acme: "true"
-#   hosts:
-#     - host: chart-example.local
-#       paths:
-#         - path: /
-#           pathType: ImplementationSpecific
-#   tls: []
-#   #  - secretName: chart-example-tls
-#   #    hosts:
-#   #      - chart-example.local
-
-# resources: {}
-#   # We usually recommend not to specify default resources and to leave this as a conscious
-#   # choice for the user. This also increases chances charts run on environments with little
-#   # resources, such as Minikube. If you do want to specify resources, uncomment the following
-#   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-#   # limits:
-#   #   cpu: 100m
-#   #   memory: 128Mi
-#   # requests:
-#   #   cpu: 100m
-#   #   memory: 128Mi
-
-# # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-# livenessProbe:
-#   httpGet:
-#     path: /
-#     port: http
-# readinessProbe:
-#   httpGet:
-#     path: /
-#     port: http
-
-# # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
-# autoscaling:
-#   enabled: false
-#   minReplicas: 1
-#   maxReplicas: 100
-#   targetCPUUtilizationPercentage: 80
-#   # targetMemoryUtilizationPercentage: 80
-
-# # Additional volumes on the output Deployment definition.
-# volumes: []
-# # - name: foo
-# #   secret:
-# #     secretName: mysecret
-# #     optional: false
-
-# # Additional volumeMounts on the output Deployment definition.
-# volumeMounts: []
-# # - name: foo
-# #   mountPath: "/etc/foo"
-# #   readOnly: true
-
-# nodeSelector: {}
-
-# tolerations: []
-
-# affinity: {}
