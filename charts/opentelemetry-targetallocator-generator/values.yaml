@@ -10,43 +10,48 @@ global:
     # For EU accounts -> https://otlp.eu01.nr-data.net
     endpoint: "https://otlp.nr-data.net"
     # Teams to segragete the telemetry data received by all of the collectors.
-    teams: {}
-      # # Platform team which is responsible for the cluster and common apps
-      # # running on it.
-      # platform:
-      #   # New Relic ingest license key
-      #   # -> Use either "value" or "secretRef" where "secretRef" will precede if both are defined
-      #   licenseKey:
-      #     # If you want to create a new secret, provide to the license key as a Helm value.
-      #     # value: ""
-      #     # If you already have your license key as a secret stored within the same
-      #     # namespace as this Helm deployment, provide the secret name and the key to
-      #     # license key.
-      #     secretRef:
-      #       name: newrelic-license-key-platform-team
-      #       key: license
+    teams: 
+      team-a:
+        licenseKey:
+          secretRef:
+            name: newrelic-license-key-app-team-a
+            key: license
+        identifier:
+          key: test.label
+          value: team-a
+        namespaces:
+          - team-a
+      team-b:
+        licenseKey:
+          secretRef:
+            name: newrelic-license-key-app-team-b
+            key: license
+        identifier:
+          key: test.label
+          value: team-b
+        namespaces:
+          - team-b
+      team-c:
+        licenseKey:
+          secretRef:
+            name: newrelic-license-key-app-team-c
+            key: license
+        identifier:
+          key: test.label
+          value: team-c
+        namespaces:
+          - team-c
+      team-d:
+        licenseKey:
+          secretRef:
+            name: newrelic-license-key-app-team-d
+            key: license
+        identifier:
+          key: test.label
+          value: team-d
+        namespaces:
+          - team-d
 
-      # If you want to send the namespaced telemetry data from the
-      # cluster to the accounts of the individual dev teams
-      # comment in below.
-      # Dev team 1 which is responsible for its own apps running
-      # in a specific namespace.
-      # team-a:
-      #   licenseKey:
-      #     secretRef:
-      #       name: newrelic-license-key-app-team-a
-      #       key: license
-      #   identifier: team-a
-      #   namespaces:
-      #     - team-a
-      # team-b:
-      #   licenseKey:
-      #     secretRef:
-      #       name: newrelic-license-key-app-team-b
-      #       key: license
-      #   identifier: team-b
-      #   namespaces:
-      #     - team-b
 
 targetAllocatorName: ""
 
@@ -78,58 +83,48 @@ clusterRole:
   annotations: {}
   # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   # Can be used in combination with presets that create a cluster role to add additional rules.
+  # Rules sourced from https://github.com/open-telemetry/opentelemetry-operator/blob/main/cmd/otel-allocator/README.md#rbac
   rules:
-    - apiGroups:
-      - monitoring.coreos.com
-      resources:
-        - alertmanagers
-        - prometheuses
-        - prometheuses/finalizers
-        - alertmanagers/finalizers
-        - servicemonitors
-        - podmonitors
-        - prometheusrules
-        - probes
-        - scrapeconfigs
-      verbs:
-        - '*'
-    - apiGroups:
-        - apps
-      resources:
-        - statefulsets
-      verbs:
-        - '*'
     - apiGroups: [""]
       resources:
-        - namespaces
-        - nodes
-        - nodes/metrics
-        - services
-        - endpoints
-        - pods
+      - nodes
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
       verbs: ["get", "list", "watch"]
     - apiGroups: [""]
       resources:
-        - configmaps
+      - configmaps
       verbs: ["get"]
     - apiGroups:
-        - discovery.k8s.io
+      - discovery.k8s.io
       resources:
-        - endpointslices
+      - endpointslices
       verbs: ["get", "list", "watch"]
     - apiGroups:
-        - networking.k8s.io
+      - networking.k8s.io
       resources:
-        - ingresses
+      - ingresses
       verbs: ["get", "list", "watch"]
     - nonResourceURLs: ["/metrics"]
       verbs: ["get"]
+    - apiGroups:
+      - monitoring.coreos.com
+      resources:
+      - servicemonitors
+      - podmonitors
+      verbs:
+      - '*'
+    - apiGroups: [""]
+      resources:
+      - namespaces
+      verbs: ["get", "list", "watch"]
 
 clusterRoleBinding:
   # Annotations to add to the clusterRoleBinding
   # Can be used in combination with presets that create a cluster role binding.
   annotations: {}
-
 # Array of key value pairs defining the ports for the
 # collector to expose
 ports:
@@ -175,6 +170,11 @@ targetAllocator:
   # - consistent-hashing (default)
   # - least-weighted
   allocationStrategy: consistent-hashing
+
+  prometheusCR:
+    enabled: true
+  podMonitorSelector: {}
+  serviceMonitorSelector: {}
 
 
 

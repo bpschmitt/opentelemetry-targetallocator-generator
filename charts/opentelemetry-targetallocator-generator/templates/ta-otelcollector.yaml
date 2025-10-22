@@ -28,9 +28,13 @@ spec:
     enabled: true
     serviceAccount: {{ include "opentelemetry-targetallocator-generator.targetAllocatorName" . }}
     prometheusCR:
-      enabled: true
-      podMonitorSelector: {}
-      serviceMonitorSelector: {}
+      enabled: {{ .Values.targetAllocator.prometheusCR.enabled | default false -}}
+      {{ if .Values.targetAllocator.podMonitorSelector }}
+      podMonitorSelector: {{ toYaml .Values.targetAllocator.podMonitorSelector | nindent 8 -}}
+      {{ end }}
+      {{- if .Values.targetAllocator.serviceMonitorSelector }}
+      serviceMonitorSelector: {{ toYaml .Values.targetAllocator.serviceMonitorSelector | nindent 8 -}}
+      {{ end }}
 
   # Security context for container priviliges
   {{- with .Values.securityContext }}
@@ -66,19 +70,12 @@ spec:
             scrape_interval: 30s
             static_configs:
             - targets: [ '0.0.0.0:8888' ]
-            metric_relabel_configs:
-            - action: labeldrop
-              regex: (id|name)
-              replacement: $$1
-            - action: labelmap
-              regex: label_(.+)
-              replacement: $$1
 
     processors:
       memory_limiter:
-        check_interval: 5s
-        limit_mib: 4000
-        spike_limit_mib: 200
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 25
       batch: {}
       k8sattributes:
         auth_type: "serviceAccount"
@@ -124,7 +121,6 @@ spec:
             key: newrelic.entity.type
             value: k8s
 
-
       {{- range $teamName, $teamInfo := $teams }}
       resource/{{ $teamName }}:
         attributes:
@@ -139,11 +135,10 @@ spec:
         table:
           {{- range $teamName, $teamInfo := $teams }}
           - context: metric
-            condition: 'resource.attributes["k8s.namespace.name"] == "{{ $teamName }}"{{ if $teamInfo.identifier }} or resource.attributes["tenant.name"] == "{{ $teamInfo.identifier }}"{{ end }}'
+            condition: 'resource.attributes["k8s.namespace.name"] == "{{ $teamName }}"{{ if $teamInfo.identifier }} or resource.attributes["{{ $teamInfo.identifier.key }}"] == "{{ $teamInfo.identifier.value }}"{{ end }}'
             pipelines:
               - metrics/{{ $teamName }}
           {{- end }}
-
 
     exporters:
       debug: {}
